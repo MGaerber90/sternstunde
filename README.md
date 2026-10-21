@@ -14,7 +14,7 @@ Browser-App zur Organisation der Klasse 9m (24 Schüler, Schuljahr 2026/27). Get
 - [x] Zugänge erzeugt: Klassencode, 24 PINs, Lehrer-PIN, Zugangskarten (`zugangskarten.local.html`)
 - [x] Supabase live (Projekt `sternstunde`, eu-west-1 Irland, Free), `config.js` gefüllt, 22 API- + 8 Browser-Tests gegen den echten Server bestanden (2026-10-21)
 - [ ] Datenschutz mit Schulleitung klären, dann Karten austeilen
-- [ ] Auf GitHub Pages veröffentlichen (nach Okay)
+- [x] Veröffentlicht: https://mgaerber90.github.io/sternstunde/ (Repo MGaerber90/sternstunde, ohne `*.local.*` und CLAUDE.md); Einzeldatei `Downloads/Sternstunde-9m.html` (2026-10-21)
 - [ ] Datenschutz mit Schulleitung bzw. Datenschutzbeauftragtem klären
 - [ ] Veröffentlichung über GitHub Pages
 

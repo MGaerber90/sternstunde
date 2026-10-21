@@ -2635,7 +2635,7 @@ function renderStudent(id) {
     <span class="star-pill" id="s-stars" title="Dein Stern-Guthaben"></span>
     <button class="btn btn-ghost btn-sm" id="s-logout">Abmelden</button>
   </header>
-  ${session.preview ? `<div class="banner">Vorschau als <b>${esc(student(id).name)}</b>. Aktionen hier sind echt (Hilferuf, Feedback, Käufe). <button class="btn btn-star btn-sm" id="s-back" style="margin-left:.6rem">Zurück zur Lehreransicht</button></div>` : ''}
+  ${session.preview ? `<div class="banner">Vorschau als <b>${esc(student(id).name)}</b>. Nur anschauen: Hilferuf, Käufe und Avatar-Änderungen werden für den Schüler gespeichert. <button class="btn btn-star btn-sm" id="s-back" style="margin-left:.6rem">Zurück zur Lehreransicht</button></div>` : ''}
   <main class="st-main">
     <div class="bday-banner" id="s-bday-banner" hidden></div>
     <section class="card st-card st-hero" id="s-hero"></section>
@@ -2867,7 +2867,8 @@ function renderStudent(id) {
   if (!s0.nickAsked) steps.push(next => openNickDialog(id, next));
   steps.push(() => { if (student(id) && !student(id).setupDone) openWardrobe(id, true); });
   const run = i => { if (steps[i]) steps[i](() => run(i + 1)); };
-  run(0);
+  /* In der Lehrer-Vorschau nicht starten, sonst würde die Ersteinrichtung des Schülers verbraucht */
+  if (!session.preview) run(0);
 }
 
 /* =========================================================
