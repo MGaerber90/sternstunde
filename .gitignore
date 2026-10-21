@@ -1,0 +1,7 @@
+# Personenbezogene Daten (Namen, PINs, Codes) nie veröffentlichen
+*.local.*
+# Sicherungen aus der App
+sternstunde-*.json
+# Interne Arbeitsnotizen
+CLAUDE.md
+notes/
