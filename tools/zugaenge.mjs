@@ -92,6 +92,9 @@ insert into item_prices (id, price, ach) values
 ${items.map(i => `  (${q(i.id)}, ${i.price}, ${i.ach ? q(i.ach) : 'null'})`).join(',\n')};
 `);
 
+// ---------- QR-Code (qr.svg, zeigt auf die App-Adresse) ----------
+const qrSvg = existsSync(P('qr.svg')) ? readFileSync(P('qr.svg'), 'utf8') : '';
+
 // ---------- Zugangskarten ----------
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 writeFileSync(P('zugangskarten.local.html'), `<!DOCTYPE html>
@@ -110,9 +113,12 @@ writeFileSync(P('zugangskarten.local.html'), `<!DOCTYPE html>
   .teacher td{border-bottom:1px solid #ddd;padding:4px 6px}
   .teacher td.pin{font-family:Consolas,monospace;font-weight:700;letter-spacing:.15em}
   .cards{display:grid;grid-template-columns:repeat(3,1fr);background:#fff}
-  .card{border:1px dashed #9aa0b8;padding:5mm;height:62mm;display:flex;flex-direction:column;gap:2mm;break-inside:avoid}
+  .card{border:1px dashed #9aa0b8;padding:4.5mm 5mm;height:69mm;display:flex;flex-direction:column;gap:1.6mm;break-inside:avoid;overflow:hidden}
   .card .top{display:flex;align-items:center;gap:2mm;font-weight:800;color:#4338ca;font-size:10pt;letter-spacing:.06em}
+  .card .head{display:flex;justify-content:space-between;align-items:flex-start;gap:3mm}
   .card .name{font-size:17pt;font-weight:800;margin-top:1mm}
+  .card .qr{width:19mm;height:19mm;flex:none}
+  .card .qr svg{width:100%;height:100%;display:block}
   .card .row{display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid #e3e5f0;padding-top:1.5mm}
   .card .row span{font-size:8pt;color:#666;text-transform:uppercase;letter-spacing:.05em}
   .card .row b{font-family:Consolas,monospace;font-size:15pt;letter-spacing:.18em}
@@ -135,16 +141,39 @@ writeFileSync(P('zugangskarten.local.html'), `<!DOCTYPE html>
 <div class="cards">
 ${students.map(s => `  <div class="card">
     <div class="top"><svg width="14" height="14" viewBox="0 0 24 24"><path fill="#f2a900" d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3 6.1 20.6l1.3-6.6L2.5 9.4l6.6-.8z"/></svg>STERNSTUNDE · 9M</div>
-    <div class="name">${esc(s.name)}</div>
+    <div class="head"><div class="name">${esc(s.name)}</div>${qrSvg ? `<div class="qr">${qrSvg}</div>` : ''}</div>
     <div class="row"><span>Klassencode</span><b>${classCode}</b></div>
     <div class="row"><span>Deine PIN</span><b>${s.pin}</b></div>
-    <div class="steps">1. Adresse öffnen &nbsp;2. „Ich bin in der Klasse“ &nbsp;3. Klassencode eingeben &nbsp;4. Namen wählen, PIN eingeben. PIN nicht weitergeben!</div>
+    <div class="steps">QR-Code scannen, „Ich bin in der Klasse“, Klassencode eingeben, Namen wählen, PIN eingeben. PIN nicht weitergeben!</div>
     <div class="url">${esc(url)}</div>
   </div>`).join('\n')}
 </div></div></body></html>
 `);
 
+writeFileSync(P('qr-plakat.local.html'), `<!DOCTYPE html>
+<html lang="de"><head><meta charset="utf-8"><title>Sternstunde · QR-Code</title>
+<style>
+  *{box-sizing:border-box} body{margin:0;font-family:"Segoe UI",system-ui,sans-serif;color:#1f1d2b;background:#fff}
+  .page{width:210mm;min-height:297mm;margin:0 auto;padding:22mm 18mm;display:flex;flex-direction:column;align-items:center;text-align:center}
+  h1{font-size:44pt;margin:0;color:#4338ca;letter-spacing:.02em} .sub{font-size:16pt;color:#555;margin:3mm 0 12mm}
+  .qr{width:140mm;height:140mm;border:3mm solid #1f1d2b;border-radius:6mm;padding:4mm} .qr svg{width:100%;height:100%;display:block}
+  .url{font-size:15pt;font-weight:700;margin-top:10mm;word-break:break-all}
+  .code{margin-top:8mm;font-size:16pt} .code b{font-family:Consolas,monospace;font-size:26pt;letter-spacing:.2em;margin-left:4mm}
+  .hint{margin-top:6mm;font-size:12pt;color:#666}
+  .bar{position:fixed;top:12px;right:12px} button{font:inherit;font-weight:700;padding:10px 16px;border:0;border-radius:10px;background:#4338ca;color:#fff;cursor:pointer}
+  @media print{@page{size:A4;margin:0} .bar{display:none}}
+</style></head><body>
+<div class="bar"><button onclick="window.print()">Als PDF herunterladen</button></div>
+<div class="page">
+  <h1>STERNSTUNDE</h1><div class="sub">Klasse 9m · Scannen und los</div>
+  <div class="qr">${qrSvg}</div>
+  <div class="url">${esc(url)}</div>
+  <div class="code">Klassencode:<b>${classCode}</b></div>
+  <div class="hint">Namen wählen, PIN von deiner Karte eingeben.</div>
+</div></body></html>
+`);
+
 console.log(`Klassencode: ${classCode}`);
 console.log(`Lehrer-PIN:  ${teacherPin}`);
 console.log(`${students.length} Schüler, ${items.length} Shop-Items`);
-console.log('Geschrieben: namen.local.js, zugang.local.json, supabase/seed.local.sql, supabase/items.sql, zugangskarten.local.html');
+console.log('Geschrieben: namen.local.js, zugang.local.json, supabase/seed.local.sql, supabase/items.sql, zugangskarten.local.html, qr-plakat.local.html');
